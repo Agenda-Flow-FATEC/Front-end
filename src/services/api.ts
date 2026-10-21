@@ -24,8 +24,17 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (token) headers.Authorization = `Bearer ${token}`;
   let response: Response;
   try {
-    response = await fetch(`${API_URL}${path}`, { method: options.method, body: options.body, headers, credentials: 'include' });
-  } catch {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    try {
+      response = await fetch(`${API_URL}${path}`, { method: options.method, body: options.body, headers, signal: controller.signal });
+    } finally {
+      clearTimeout(timeout);
+    }
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error('O servidor demorou para responder. Confira se o Gateway está no ar em http://localhost:8080.');
+    }
     throw new Error('Não foi possível conectar ao servidor. Confira se o Gateway está no ar (porta 8080) e o EXPO_PUBLIC_API_URL.');
   }
   if (response.status === 401 && !path.startsWith('/auth/')) {
