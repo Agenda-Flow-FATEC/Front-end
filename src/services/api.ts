@@ -1,7 +1,6 @@
-import { readJson, removeItem, STORAGE_KEYS } from '@/src/lib/storage';
-import type { Appointment, AuthResponse, CreateAppointmentPayload, CreateServicePayload, MonthlyReport, Service, SlotAdmin, TimeSlot } from '@/src/types';
+import type { Appointment, AuthResponse, CreateAppointmentPayload, CreateServicePayload, MonthlyReport, Service, SlotAdmin, TimeSlot, User } from '@/src/types';
 
-const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://10.0.2.2:8080/api').replace(/\/$/, '');
+const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8080/api').replace(/\/$/, '');
 export const MOCK_MODE = process.env.EXPO_PUBLIC_MOCK_MODE === 'true';
 
 const mockServices: Service[] = [
@@ -14,33 +13,22 @@ const mockServices: Service[] = [
 const mockAppointments: Record<string, Appointment> = {};
 const reservedSlots = new Set<string>();
 
+let mockUser: User | null = null;
 let onUnauthorized: (() => void) | null = null;
 export function setUnauthorizedHandler(handler: (() => void) | null) { onUnauthorized = handler; }
 
 type RequestOptions = { method?: string; body?: string; headers?: Record<string, string> };
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const token = await readJson<string>(STORAGE_KEYS.token);
   const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/json', ...(options.headers ?? {}) };
-  if (token) headers.Authorization = `Bearer ${token}`;
   let response: Response;
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
-    try {
-      response = await fetch(`${API_URL}${path}`, { method: options.method, body: options.body, headers, signal: controller.signal });
-    } finally {
-      clearTimeout(timeout);
-    }
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      throw new Error('O servidor demorou para responder. Confira se o Gateway está no ar em http://localhost:8080.');
-    }
+    // O token vive so no cookie HttpOnly tokenAgendaFlow: o back o grava no login e o fetch o reenvia com credentials: 'include'.
+    // Nada de token em localStorage/AsyncStorage, onde qualquer script da pagina conseguiria le-lo.
+    response = await fetch(`${API_URL}${path}`, { method: options.method, body: options.body, headers, credentials: 'include' });
+  } catch {
     throw new Error('Não foi possível conectar ao servidor. Confira se o Gateway está no ar (porta 8080) e o EXPO_PUBLIC_API_URL.');
   }
-  if (response.status === 401 && !path.startsWith('/auth/')) {
-    await removeItem(STORAGE_KEYS.token); await removeItem(STORAGE_KEYS.user);
-    onUnauthorized?.();
-  }
+  if (response.status === 401 && !path.startsWith('/auth/')) onUnauthorized?.();
   const text = await response.text(); let body: unknown = null; try { body = text ? JSON.parse(text) : null; } catch { body = text; }
   if (!response.ok) {
     const message = typeof body === 'object' && body && 'message' in body ? String((body as { message?: string }).message) : typeof body === 'object' && body && 'erro' in body ? String((body as { erro?: string }).erro) : response.status === 401 ? 'Sessão expirada. Entre novamente.' : response.status === 403 ? 'Você não tem permissão para esta ação.' : `Erro HTTP ${response.status}`;
@@ -50,15 +38,20 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 }
 
 export async function login(email: string, senha: string): Promise<AuthResponse> {
-  if (MOCK_MODE) return { token: 'mock-token', usuario: { id: email.includes('admin') ? 'admin-1' : `u-${email}`, nome: email.includes('admin') ? 'Administrador' : 'João', email, role: email.includes('admin') ? 'ADMIN' : 'COMUM' } };
+  if (MOCK_MODE) { mockUser = { id: email.includes('admin') ? 'admin-1' : `u-${email}`, nome: email.includes('admin') ? 'Administrador' : 'João', email, role: email.includes('admin') ? 'ADMIN' : 'COMUM' }; return { token: '', usuario: mockUser }; }
   return request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email, senha }) });
 }
 export async function register(nome: string, email: string, senha: string): Promise<AuthResponse> {
-  if (MOCK_MODE) return { token: 'mock-token', usuario: { id: `u-${Date.now()}`, nome, email, role: 'COMUM' } };
+  if (MOCK_MODE) { mockUser = { id: `u-${Date.now()}`, nome, email, role: 'COMUM' }; return { token: '', usuario: mockUser }; }
   return request<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify({ nome, email, senha, role: 'COMUM' }) });
 }
+// Restaura a sessao depois de recarregar a pagina: o cookie vai sozinho e o back devolve quem esta logado (ou 401).
+export async function getCurrentUser(): Promise<User | null> {
+  if (MOCK_MODE) return mockUser;
+  try { return await request<User>('/auth/me'); } catch { return null; }
+}
 export async function logout(): Promise<void> {
-  if (MOCK_MODE) return;
+  if (MOCK_MODE) { mockUser = null; return; }
   try { await request<void>('/auth/logout', { method: 'POST' }); } catch { /* sem rede: a sessão local é encerrada mesmo assim */ }
 }
 export async function getServices(): Promise<Service[]> { if (MOCK_MODE) return mockServices.filter((s) => s.ativo); return request<Service[]>('/servicos?ativo=true'); }
@@ -89,6 +82,7 @@ export async function cancelAppointment(id: string): Promise<Appointment> {
   return request<Appointment>(`/agendamentos/${id}/cancelar`, { method: 'POST' });
 }
 
+// --- Telas de admin (só funcionam com o backend real) ---
 const SO_BACKEND = 'Disponível apenas com o backend real (EXPO_PUBLIC_MOCK_MODE=false).';
 export async function openSlots(servicoId: string, data: string, horas: string[]): Promise<SlotAdmin[]> {
   if (MOCK_MODE) throw new Error(SO_BACKEND);

@@ -1,8 +1,7 @@
 import { useRouter, useSegments } from 'expo-router';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { PropsWithChildren } from 'react';
-import { login as apiLogin, logout as apiLogout, register as apiRegister, setUnauthorizedHandler } from '@/src/services/api';
-import { readJson, removeItem, saveJson, STORAGE_KEYS } from '@/src/lib/storage';
+import { getCurrentUser, login as apiLogin, logout as apiLogout, register as apiRegister, setUnauthorizedHandler } from '@/src/services/api';
 import type { User } from '@/src/types';
 
 interface AuthContextValue {
@@ -20,7 +19,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const segments = useSegments();
   const router = useRouter();
   useEffect(() => { setUnauthorizedHandler(() => setUser(null)); return () => setUnauthorizedHandler(null); }, []);
-  useEffect(() => { (async () => { const stored = await readJson<User>(STORAGE_KEYS.user); setUser(stored); setLoading(false); })(); }, []);
+  useEffect(() => { getCurrentUser().then(setUser).finally(() => setLoading(false)); }, []);
   useEffect(() => {
     if (loading) return;
     const inAuth = segments[0] === '(auth)';
@@ -30,9 +29,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const value = useMemo<AuthContextValue>(() => ({
     user,
     loading,
-    async signIn(email, senha) { const result = await apiLogin(email.trim(), senha); await saveJson(STORAGE_KEYS.token, result.token); await saveJson(STORAGE_KEYS.user, result.usuario); setUser(result.usuario); },
-    async signUp(nome, email, senha) { const result = await apiRegister(nome.trim(), email.trim(), senha); await saveJson(STORAGE_KEYS.token, result.token); await saveJson(STORAGE_KEYS.user, result.usuario); setUser(result.usuario); },
-    async signOut() { await apiLogout(); await removeItem(STORAGE_KEYS.token); await removeItem(STORAGE_KEYS.user); setUser(null); router.replace('/(auth)/login'); },
+    async signIn(email, senha) { const result = await apiLogin(email.trim(), senha); setUser(result.usuario); },
+    async signUp(nome, email, senha) { const result = await apiRegister(nome.trim(), email.trim(), senha); setUser(result.usuario); },
+    async signOut() { await apiLogout(); setUser(null); router.replace('/(auth)/login'); },
   }), [loading, router, user]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
