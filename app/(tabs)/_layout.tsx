@@ -94,7 +94,7 @@ function DesktopTabs({ user }: { user: ReturnType<typeof useAuth>['user'] }) {
         <View style={styles.topBar}>
           <View>
             <Text style={styles.topBarTitle}>AgendaFlow</Text>
-            <Text style={styles.topBarSubtitle}>Tudo em um só lugar.</Text>
+            <Text style={styles.topBarSubtitle}>Tudo em vários lugares.</Text>
           </View>
           <View style={styles.topBarBadge}><View style={styles.liveDot} /><Text style={styles.topBarBadgeText}>ONLINE</Text></View>
         </View>
