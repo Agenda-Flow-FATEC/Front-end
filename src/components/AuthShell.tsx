@@ -40,7 +40,7 @@ export function AuthShell({
                   <View style={styles.featureList}>
                     <Feature icon="01" text="Encontre serviços em poucos toques." />
                     <Feature icon="02" text="Reserve horários com mais praticidade." />
-                    <Feature icon="03" text="Acompanhe tudo em um só lugar." />
+                    <Feature icon="03" text="Acompanhe tudo em vários lugares." />
                   </View>
                 </View>
                 <View style={styles.visualFooter}><Text style={styles.visualFooterText}>AGENDAFLOW</Text><Text style={styles.visualFooterDot}>•</Text><Text style={styles.visualFooterText}>SIMPLES · RÁPIDO · ORGANIZADO</Text></View>
