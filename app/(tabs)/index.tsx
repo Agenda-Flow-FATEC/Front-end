@@ -41,7 +41,7 @@ export default function ServicesScreen() {
         </View>
       </View>
 
-      <View style={[styles.hero, desktop && styles.heroDesktop]}> 
+      <View style={[styles.hero, desktop && styles.heroDesktop]}>
         <View style={[styles.heroAccent, desktop && styles.heroAccentDesktop]} />
         <View style={[styles.heroContent, desktop && styles.heroContentDesktop]}>
           <View style={styles.liveBadge}><View style={styles.liveDot} /><Text style={styles.liveText}>AGENDA EM TEMPO REAL</Text></View>
@@ -78,6 +78,7 @@ export default function ServicesScreen() {
         columnWrapperStyle={columns > 1 ? styles.columnWrapper : undefined}
         data={visible}
         keyExtractor={(x) => x.id}
+        showsHorizontalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.primary} />}
         contentContainerStyle={[styles.content, desktop && styles.contentDesktop]}
         ListHeaderComponent={header}

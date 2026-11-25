@@ -37,4 +37,4 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({ link: { color: colors.primaryDark, fontWeight: '900', textAlign: 'center', marginTop: 16, fontSize: 12 } });
+const styles = StyleSheet.create({ link: { color: '#340fc6', fontWeight: '900', textAlign: 'center', marginTop: 16, fontSize: 12 } });

@@ -1,0 +1,75 @@
+name: Pipeline do Front
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  verificacao:
+    name: 1. Typecheck e build web
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Baixa o codigo
+        uses: actions/checkout@v4
+
+      - name: Instala o Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Instala as dependencias
+        run: npm install --legacy-peer-deps
+
+      - name: Confere os tipos (TypeScript)
+        run: npm run typecheck
+
+      - name: Gera o build web
+        run: npx expo export --platform web
+        env:
+          EXPO_PUBLIC_API_URL: /api
+          EXPO_PUBLIC_MOCK_MODE: 'false'
+
+  deploy:
+    name: 2. Deploy na Vercel
+    needs: verificacao
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-22.04
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Baixa o codigo
+        uses: actions/checkout@v4
+
+      - name: Instala o Node
+        if: env.VERCEL_TOKEN != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Instala a CLI da Vercel
+        if: env.VERCEL_TOKEN != ''
+        run: npm install --global vercel@latest
+
+      - name: Baixa a configuracao do projeto
+        if: env.VERCEL_TOKEN != ''
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Gera o build para producao
+        if: env.VERCEL_TOKEN != ''
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+
+      - name: Publica na Vercel
+        if: env.VERCEL_TOKEN != ''
+        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      - name: Token da Vercel nao configurado
+        if: env.VERCEL_TOKEN == ''
+        run: echo "Secret VERCEL_TOKEN nao existe. Se o projeto esta conectado ao Git na Vercel, ela mesma publica a cada push."

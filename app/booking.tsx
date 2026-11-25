@@ -41,6 +41,7 @@ export default function BookingScreen() {
   return (
     <Screen padded={false}>
       <ScrollView contentContainerStyle={styles.content}>
+        <Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backArrow}>‹</Text><Text style={styles.backLabel}>Voltar</Text></Pressable>
         <Text style={styles.kicker}>RESERVA</Text>
         <Text style={styles.title}>Escolha seu horário</Text>
 
@@ -70,6 +71,9 @@ export default function BookingScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: spacing.md, paddingTop: 18, paddingBottom: 110 },
+  back: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
+  backArrow: { color: colors.primary, fontSize: 28, lineHeight: 28, marginRight: 4, fontWeight: '900', marginTop: -5 },
+  backLabel: { color: colors.text, fontWeight: '900', fontSize: 12 },
   kicker: { color: colors.primary, fontSize: 9, fontWeight: '900', letterSpacing: 1.2 },
   title: { fontSize: 28, fontWeight: '900', color: colors.text, marginTop: 4, marginBottom: 18, letterSpacing: -0.5 },
   serviceLoading: { height: 82, backgroundColor: colors.surface, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },

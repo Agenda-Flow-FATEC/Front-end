@@ -29,7 +29,7 @@ export function AuthShell({
                 <View style={styles.visualTop}>
                   <BrandMark />
                   <View style={styles.brandTextWrap}>
-                    <Text style={styles.brand}>AgendaFlow</Text>
+                    <Text style={[styles.brand, styles.visualBrand]}>AgendaFlow</Text>
                     <Text style={styles.brandCaption}>Seu tempo, do seu jeito.</Text>
                   </View>
                 </View>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   scrollDesktop: { paddingVertical: 42 },
   shell: { width: '100%', maxWidth: 640, alignSelf: 'center' },
   shellDesktop: { maxWidth: 1120, flexDirection: 'row', minHeight: 610, borderRadius: 30, overflow: 'hidden', ...shadow.floating },
-  visual: { flex: 1.02, backgroundColor: '#F0F1F7', padding: 38, justifyContent: 'space-between', overflow: 'hidden', borderRightWidth: 1, borderRightColor: colors.border },
+  visual: { flex: 1.02, backgroundColor: '#fefeff', padding: 38, justifyContent: 'space-between', overflow: 'hidden', borderRightWidth: 1, borderRightColor: colors.border },
   visualOrbOne: { position: 'absolute', width: 240, height: 240, borderRadius: 120, backgroundColor: '#E7E5FF', right: -90, top: -80 },
   visualOrbTwo: { position: 'absolute', width: 150, height: 150, borderRadius: 75, backgroundColor: '#E3F3EE', left: -70, bottom: 80 },
   visualTop: { flexDirection: 'row', alignItems: 'center' },
@@ -98,13 +98,13 @@ const styles = StyleSheet.create({
   brandCaption: { color: colors.muted, fontSize: 11, marginTop: 2 },
   visualCopy: { maxWidth: 420 },
   visualEyebrow: { color: colors.primaryDark, fontSize: 10, fontWeight: '900', letterSpacing: 1.4 },
-  visualTitle: { color: colors.text, fontSize: 36, lineHeight: 43, fontWeight: '900', letterSpacing: -1.2, marginTop: 9 },
+  visualTitle: { color: '#1E1B4B', fontSize: 36, lineHeight: 43, fontWeight: '900', letterSpacing: -1.2, marginTop: 9 },
   visualSubtitle: { color: colors.muted, fontSize: 13, lineHeight: 20, marginTop: 12, maxWidth: 390 },
   featureList: { marginTop: 26, gap: 10 },
   feature: { flexDirection: 'row', alignItems: 'center' },
   featureIcon: { width: 30, height: 30, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: '#DCDDE7', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
   featureIconText: { color: colors.primaryDark, fontSize: 9, fontWeight: '900' },
-  featureText: { color: colors.text, fontSize: 11, fontWeight: '700' },
+  featureText: { color: '#374151', fontSize: 11, fontWeight: '700' },
   visualFooter: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   visualFooterText: { color: colors.subtle, fontSize: 8, fontWeight: '900', letterSpacing: 1 },
   visualFooterDot: { color: colors.primary, fontSize: 9 },
@@ -116,4 +116,5 @@ const styles = StyleSheet.create({
   mobileEyebrow: { color: colors.primary, fontSize: 9, fontWeight: '900', letterSpacing: 1.3, marginBottom: 6 },
   formTitle: { color: colors.text, fontSize: 25, lineHeight: 30, fontWeight: '900', letterSpacing: -0.4 },
   formHint: { color: colors.muted, fontSize: 11, lineHeight: 17, marginTop: 4, marginBottom: 18 },
+  visualBrand: { color: '#1E1B4B' }
 });

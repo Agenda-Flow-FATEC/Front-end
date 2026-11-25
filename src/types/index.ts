@@ -67,4 +67,5 @@ export interface MonthlyReport {
   quantidadeTotal: number;
   valorTotal: number;
   porServico: { servicoId: string; servicoNome: string; quantidade: number; valorTotal: number }[];
+  desatualizado?: boolean
 }

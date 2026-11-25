@@ -15,8 +15,8 @@ export default function ServiceScreen() {
   if (!service) return <Screen><ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} /></Screen>;
 
   return (
-    <Screen padded={false}>
-      <ScrollView contentContainerStyle={styles.content}>
+    <Screen padded={false} >
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backArrow}>‹</Text><Text style={styles.backLabel}>Voltar</Text></Pressable>
         <View style={styles.hero}>
           <View style={styles.heroOrb}><Text style={styles.heroIcon}>✦</Text></View>
@@ -44,7 +44,7 @@ export default function ServiceScreen() {
 const styles = StyleSheet.create({
   content: { paddingHorizontal: spacing.md, paddingTop: 18, paddingBottom: 110 },
   back: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
-  backArrow: { color: colors.primary, fontSize: 28, lineHeight: 28, marginRight: 4 },
+  backArrow: { color: colors.primary, fontSize: 28, lineHeight: 28, marginRight: 4, fontWeight: '900', marginTop: -5 },
   backLabel: { color: colors.text, fontWeight: '900', fontSize: 12 },
   hero: { minHeight: 210, borderRadius: radius.xl, backgroundColor: colors.dark, padding: 20, justifyContent: 'flex-end', overflow: 'hidden', ...shadow.floating },
   heroOrb: { position: 'absolute', top: 20, right: 20, width: 58, height: 58, borderRadius: 19, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '5deg' }] },

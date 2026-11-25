@@ -112,7 +112,7 @@ function Relatorio() {
     <Input label="Mês (AAAA-MM)" value={mes} onChangeText={setMes} autoCapitalize="none" placeholder="2026-10" leftIcon="◷" />
     <Button title="Gerar relatório" onPress={gerar} loading={loading} icon="→" />
     {relatorio ? <View style={{ marginTop: 18 }}>
-      <Card style={styles.total}><Text style={styles.totalLabel}>Faturamento de {relatorio.mes}</Text><Text style={styles.totalValue}>{formatBRL(relatorio.valorTotal)}</Text><Text style={styles.totalLabel}>{relatorio.quantidadeTotal} agendamento(s) confirmado(s)</Text></Card>
+      <Card style={styles.total}><Text style={styles.totalLabel}>Faturamento de {relatorio.mes}</Text><Text style={styles.totalValue}>{formatBRL(relatorio.valorTotal)}</Text><Text style={styles.totalLabel}>{relatorio.quantidadeTotal} agendamento(s) confirmado(s)</Text>{relatorio.desatualizado ? <Text style={styles.totalLabel}>Dados desatualizados: o serviço de agendamentos está indisponível, mostrando o último relatório gerado.</Text> : null}</Card>
       {relatorio.porServico.length === 0 ? <EmptyState icon="◌" title="Sem agendamentos confirmados" description="Nenhum serviço foi confirmado neste mês." /> : relatorio.porServico.map((s) => <Card key={s.servicoId} style={styles.slotRow}><View style={{ flex: 1 }}><Text style={styles.slotTitle}>{s.servicoNome}</Text><Text style={styles.slotMeta}>{s.quantidade} × confirmado(s)</Text></View><Text style={styles.slotTitle}>{formatBRL(s.valorTotal)}</Text></Card>)}
     </View> : null}
   </View>;
